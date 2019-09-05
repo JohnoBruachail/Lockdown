@@ -2,49 +2,35 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerMovement : MonoBehaviour {
+public class PlayerMovement : MonoBehaviour
+{
+    public PlayerCharacterController2D controller;
+    public float runSpeed = 40f;
+    float horizontalMove = 0f;
+    bool jump = false;
+    bool crouch = false;
 
-	public float speed;
-	public float distance;
+    // Update is called once per frame
+    void Update(){
 
-	private float inputHorizontal;
-	private float inputVertical;
+        //Detect input from player each frame             Adjusts normal speed by runspeed
+        horizontalMove = Input.GetAxisRaw("Horizontal") * runSpeed;
 
-	private bool isClimbing;
+        if(Input.GetButtonDown("Jump")){
+            Debug.Log("Jump used");
+            jump = true;
+        }
+        if(Input.GetButtonDown("Crouch")){
+            crouch = true;
+        }else if(Input.GetButtonUp("Crouch")){
+            crouch = false;
+        }
+    }
 
-	public LayerMask whatIsLadder;
+    //Fixed update used for physics as its called more then each frame per second
+    void FixedUpdate(){
 
-	private Rigidbody2D rigidB;
-
-	// Use this for initialization
-	void Start () {
-		rigidB = GetComponent<Rigidbody2D>();
-		
-	}
-	
-	// Update is called once per frame
-	void FixedUpdate () {
-		inputHorizontal = Input.GetAxisRaw("Horizontal");
-		rigidB.velocity = new Vector2(inputHorizontal * speed, rigidB.velocity.y);
-
-		RaycastHit2D hitInfo = Physics2D.Raycast(transform.position, Vector2.up, distance, whatIsLadder);
-
-		if(hitInfo.collider != null){
-			if(Input.GetKeyDown(KeyCode.W)){
-
-			}
-		}
-		else {
-			isClimbing = false;
-		}
-
-		if(isClimbing == true){
-			inputVertical = Input.GetAxisRaw("Vertical");
-			rigidB.velocity = new Vector2(rigidB.position.x, inputVertical * speed);
-			rigidB.gravityScale = 0;
-		}
-		else{
-			rigidB.gravityScale = 5;
-		}
-	}
+        controller.Move(horizontalMove * Time.fixedDeltaTime, crouch, jump);
+        jump = false;
+    }
 }

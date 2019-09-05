@@ -3,51 +3,52 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
-public struct MineTier
+public struct TeleporterTier
 {
-    public int output;
-    public int outputCap;
+    public int teleportCost;
 }
 
-public class Mine : Building, IInteractable
+public class Teleporter : Building, IInteractable
 {
-    public MineTier[] mineTiers;
-    public int eCrystals;
-    public GameObject eCrystal;
+
+    public TeleporterTier[] tpTiers;
 
     public Player player;
-
     // Start is called before the first frame update
-    void Start(){
-        InvokeRepeating("ProduceCrystals", 20.0f, 20.0f);
-    }
 
-    // Update is called once per frame
-    void Update(){
+    void Start()
+    {
         
     }
 
-    //the player interacts with the mine
-    //the mine checks the players crystals
-    //if theres enough it will
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
 
-
-
-    //The mines interact upgrades the mine
     public void Interact(){
 
         if(buildingTiers[currentTier].upgradeCost == 0){
-            //flash the message "MAX LEVEL REACHED"
-            interactionPrompt.SetActive(false);
-            maxLevelAlert.SetActive(true);
-            Invoke("CloseAlerts", 5.0f);
-
+            if(tpTiers[currentTier].teleportCost > player.eCrystals){
+                //flash the message "NOT ENOUGH RESOURCES"
+                interactionPrompt.SetActive(false);
+                notEnoughResourcesAlert.SetActive(true);
+                Invoke("CloseAlerts", 5.0f);
+            }else if(active){
+                //activate the teleport back to base
+                interactionPrompt.SetActive(false);
+                player.eCrystals -= tpTiers[currentTier].teleportCost;
+                Invoke("Teleport", 2.0f);
+            }else{
+                //flash message building is inactive
+            }
         }else if(buildingTiers[currentTier].upgradeCost > player.eCrystals){
             //flash the message "NOT ENOUGH RESOURCES"
             interactionPrompt.SetActive(false);
             notEnoughResourcesAlert.SetActive(true);
             Invoke("CloseAlerts", 5.0f);
-
+            
         }else if(roomReference.isRoomPowered){
             //flash upgrade message
             player.eCrystals -= buildingTiers[currentTier].upgradeCost;
@@ -57,35 +58,24 @@ public class Mine : Building, IInteractable
         }else{
             //flash message that room is not powered
         }
+
     }
 
-
-
-    public void ProduceCrystals(){
-
-        eCrystals += mineTiers[currentTier].output;
-
-        if(eCrystals > mineTiers[currentTier].outputCap){
-            eCrystals = mineTiers[currentTier].outputCap;
-        }
-        Debug.Log("We made some crystals");
+    public void Teleport(){
+        player.gameObject.transform.position = new Vector3(50,50,50);
     }
 
     public new void OnTriggerEnter2D(Collider2D other){
         if(other.gameObject.CompareTag("Player")){
-            
+
             player = other.GetComponent<Player>();
-            Debug.Log("Player collided with Mine");
+            Debug.Log("Player collided with Tower");
 
 			interactionPrompt.SetActive(true);
-
-			for(int i = 0; i < eCrystals; i++){
-                Instantiate(eCrystal);
-                Instantiate(eCrystal, gameObject.transform.position, Quaternion.identity);
-            }
-            eCrystals = 0;
         }
     }
+
+
     public new void OnTriggerExit2D(Collider2D other){
         if(other.gameObject.CompareTag("Player")){
 
@@ -93,4 +83,5 @@ public class Mine : Building, IInteractable
 			interactionPrompt.SetActive(false);
         }
     }
+
 }

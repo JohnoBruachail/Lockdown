@@ -2,23 +2,26 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Character : MonoBehaviour {
+public abstract class Character : MonoBehaviour {
 
 	public int currentHP;
 	public int maxHP;
-	public int orbs;
-	public int maxOrbs;
-	public bool onLadder;
+	public int eCrystals;
+	public int eCrystalsCapacity;
+	public bool alive = true;
 
-	public Rigidbody2D rigidB;
+	public void ChangeHP(int amount){
+		currentHP += amount;
 
-	// Use this for initialization
-	void Start () {
-
+		//set its state to dead, animate its death animation and call for it to be destroyed in 5 seconds.
+		if(currentHP <= 0){
+			alive = false;
+			//in each character we can change the animation if alive = false and remove input/actions in update
+			Invoke("Die", 5);
+		}
 	}
-	
-	// Update is called once per frame
-	void Update () {
 
-	}
+	private void Die(){
+        Destroy(gameObject);
+    }
 }

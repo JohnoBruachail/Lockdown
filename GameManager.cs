@@ -2,81 +2,85 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour {
+public class GameManager : MonoBehaviour
+{
+    private static GameManager instance;
 
-	public static GameManager instance = null;
+    public static GameManager Instance {
+        get {
+                return instance;
+            }
+    }
 
-	float breachTriggerTime = 10f;
-	float breachEndTime = 90f;
-	float time;
+    private void Awake(){
+        if (instance != null && instance != this){
+            
+            Destroy(this.gameObject);
+            
+        }
+        else {
+            instance = this;
+        }
+    }
 
-	public List<GameObject> robots;
-	public List<GameObject> monsters;
-	public List<GameObject> breaches;
+    public int transformerUpgradeCost = 1;
+    public int transformerUpgradeTally = 0;
+    public List<Breach> breaches = new List<Breach>();  // a record of the breaches on the map.
+    int breachesAge = 0;                                //To keep track of the number of cycles that have occured
+    public List<Room> breachRooms;
+    public List<RoomReference> waveSpawnRooms = new List<RoomReference>();
 
-	public List<GameObject> workerJobs;
 
-	void Awake(){
+    //I want to keep track of what rooms are breach rooms, and when a breach starts trigger all breach rooms
 
-		if (instance == null){
-			
-			//if not, set instance to this
-			instance = this;
-		}
-		else if (instance != this){
 
-            //Then destroy this. This enforces our singleton pattern, meaning there can only ever be one instance of a GameManager.
-            Destroy(gameObject);   
-		}
 
-		DontDestroyOnLoad(gameObject);
 
-		robots = new List<GameObject>();
-		monsters = new List<GameObject>();
-		breaches = new List<GameObject>();
-	}
+    // ON START SET THE TRIGGER RATE FOR WAVE CYCLES AND 
+    void Start(){
+        InvokeRepeating("TriggerBreach", 5.0f, 5.0f);
+        Debug.Log("TriggerBreach invoked");
+    }
 
-	// Use this for initialization
-	void Start ()
-	{
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
 
-	}
+    public void AddBuilding(){
 
-	// Update is called once per frame
-	void Update ()
-	{
+    }
 
-		updateTime();
-		
-	}
+    //Removes a powered up room from the wave spawn list and adds its children to the list in its place.
+    public void PowerUpRoom(RoomReference roomRef){
 
-	public void addRobotToList()
-	{
-		
-	}
+        if(transformerUpgradeCost == transformerUpgradeTally){
+            transformerUpgradeTally = 0;
+            transformerUpgradeCost++;
+        }else{
+            transformerUpgradeTally++;
+        }
 
-	public void addBuildToList()
-	{
+        waveSpawnRooms.Remove(roomRef);
 
-	}
+        foreach(RoomReference child in roomRef.children){
+            waveSpawnRooms.Add(child);
+        }
+    }
 
-	public void addBreachToList(GameObject inputBreach)
-	{
-		breaches.Add(inputBreach);
-	}
+    void TriggerBreach(){
 
-	void updateTime(){
-		time += Time.deltaTime;
-		if(time > breachTriggerTime){
+        foreach(Room room in breachRooms){
 
-			Debug.Log("Breach Time Boys");
+            room.CreateBreach(breachesAge);
+            breachesAge++;
+        }
 
-			foreach(GameObject breach in breaches){
-				breach.GetComponent<Breach>().Trigger();
-			}
 
-			time = 0;
+    }
 
-		}
-	}
+    public void AddBreach(Breach breach){
+        breaches.Add(breach);
+    }
 }

@@ -4,28 +4,17 @@ using UnityEngine;
 
 public class Breach : MonoBehaviour {
 
-	public GameObject[] creatures;
+	//DONT WANT THIS, WANT AN OVERSEEING MANAGER THAT SEARCHES FOR AND STORES EACH BREACH AS ITS ADDED TO THE GAME, ORDERS THEM INTO A LIST AND TRIGGERS WHATEVER ONE IS AT THE TOP OF THE LIST
+	//IE IS CLOSEST TO THE GENERATOR. AS EACH BREACH IS 
 
-	int age = 0;
+	public GameObject[] creatures;
 	int numberOfEnemys;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
-
-	public void Trigger(){
+	public void NewBreach(int breachesAge){
 
 		numberOfEnemys = 1;
-		//UnityEngine.Random.Range(age, (age+5));
-
 		//early game, mid game and late game enemy types
-		if(age <= 20){
+		if(breachesAge <= 20){
 			for(int i = 0; i < numberOfEnemys; i++){
 
 				GameObject instance = (GameObject) Instantiate(creatures[0]);
@@ -33,7 +22,7 @@ public class Breach : MonoBehaviour {
 				instance.GetComponent<Rigidbody2D>().AddForce(new Vector2(0f, 600));
 			}
 		}
-		else if(age <= 40){
+		else if(breachesAge <= 40){
 			for(int i = 0; i < numberOfEnemys; i++){
 
 				GameObject instance = (GameObject) Instantiate(creatures[UnityEngine.Random.Range(0,1)]);
@@ -42,7 +31,7 @@ public class Breach : MonoBehaviour {
 
 			}
 		}
-		else if(age <= 60){
+		else if(breachesAge <= 60){
 			for(int i = 0; i < numberOfEnemys; i++){
 
 				GameObject instance = (GameObject) Instantiate(creatures[UnityEngine.Random.Range(0,2)]);
@@ -51,7 +40,5 @@ public class Breach : MonoBehaviour {
 
 			}
 		}
-
-		age++;
 	}
 }

@@ -25,17 +25,5 @@ public class BulletBehavior : MonoBehaviour
     {
         float timeInterval = Time.time - startTime;
         gameObject.transform.position = Vector3.Lerp(startPosition, targetPosition, timeInterval * speed / distance);
-
-/* 
-        if (gameObject.transform.position.Equals(targetPosition))
-        {
-            if (target != null)
-            {
-                Destroy(gameObject);
-            }
-            Destroy(gameObject);
-        }
-*/
     }
-
 }
